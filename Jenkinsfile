@@ -39,7 +39,7 @@ pipeline {
                stage('Push image to Hub'){
             steps{
                 script{
-                   withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
+                   withCredentials([string(credentialsId: 'dockerr', variable: 'docker')]) {
                        bat 'docker login -u imanhrt -p ${dockerhubpwd}'
                          }
 
