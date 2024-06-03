@@ -40,12 +40,12 @@ pipeline {
             steps{
                 script{
                    withCredentials([string(credentialsId: 'dockerr', variable: 'docker')]) {
-                       bat 'docker login -u imanhrt -p ${docker}'
+                       bat 'echo %docker% |docker login -u imanhrt -p ${docker}'
                          }
 
 
 
-                   bat 'docker push javatechie/devops-integration'
+                      bat 'docker push javatechie/devops-integration'
                 }
             }
         }
