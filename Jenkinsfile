@@ -1,39 +1,54 @@
 pipeline {
     agent any
-    tools{
-        maven 'maven_3_5_0'
+    tools {
+        maven 'maven_3_9_7'
     }
-    stages{
-        stage('Build Maven'){
-            steps{
-                checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Java-Techie-jt/devops-automation']]])
-                sh 'mvn clean install'
-            }
-        }
-        stage('Build docker image'){
-            steps{
-                script{
-                    sh 'docker build -t javatechie/devops-integration .'
+    environment {
+        JAVA_HOME = 'C:\\Program Files\\Java\\jdk-17'
+        PATH = "${env.JAVA_HOME}\\bin;${env.PATH}"
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    retry(3) {
+                        checkout([
+                            $class: 'GitSCM',
+                            branches: [[name: '*/main']],
+                            extensions: [],
+                            userRemoteConfigs: [[url: 'https://github.com/iman-11/test_jenkins']]
+                        ])
+                    }
                 }
             }
         }
-        stage('Push image to Hub'){
+        stage('Build Maven') {
+            steps {
+                bat 'mvn clean install'
+            }
+        }
+         stage('Build docker image'){
+            steps{
+                script{
+                    bat 'docker build -t javatechie/devops-integration .'
+                }
+
+
+            }
+        }
+               stage('Push image to Hub'){
             steps{
                 script{
                    withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
-                   sh 'docker login -u javatechie -p ${dockerhubpwd}'
+                       bat 'docker login -u imanhrt -p ${dockerhubpwd}'
+                         }
 
-}
-                   sh 'docker push javatechie/devops-integration'
+
+
+                   bat 'docker push javatechie/devops-integration'
                 }
             }
         }
-        stage('Deploy to k8s'){
-            steps{
-                script{
-                    kubernetesDeploy (configs: 'deploymentservice.yaml',kubeconfigId: 'k8sconfigpwd')
-                }
-            }
-        }
+
     }
 }
