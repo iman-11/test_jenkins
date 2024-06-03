@@ -40,7 +40,7 @@ pipeline {
             steps{
                 script{
                    withCredentials([string(credentialsId: 'dockerr', variable: 'docker')]) {
-                       bat 'docker login -u imanhrt -p ${dockerhubpwd}'
+                       bat 'docker login -u imanhrt -p ${docker}'
                          }
 
 
